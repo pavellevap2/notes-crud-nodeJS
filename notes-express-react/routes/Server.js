@@ -23,10 +23,11 @@ app.get("/users", (req, res) => {
     res.send(html);
 });
 
-app.post("/users", (req, res) => {
+app.post("/register", (req, res) => {
     users.push({
-        id : users.length + 1,
-        name : req.body.name
+        password: req.body.password,
+        email: req.body.email,
+        name : req.body.username
     });
     res.send(users);
 });

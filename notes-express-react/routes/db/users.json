@@ -2,16 +2,19 @@
   {
     "id": 1,
     "name": "Alexandr",
+    "username": "alexandr",
     "email" : "1stmail@mail.ru"
   },
   {
     "id": 2,
     "name": "Pavel",
+    "username": "alexandr",
     "email" : "2ndmail@mail.ru"
   },
   {
     "id": 3,
     "name": "Andrey",
+    "username": "alexandr",
     "email" : "3dmail@mail.ru"
   }
 
