@@ -10,6 +10,7 @@ let notes = require("./db/notes");
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
@@ -33,7 +34,7 @@ app.post("/users", (req, res) => {
 
 
 //страница всех заметок пользователя
-app.get("/users/:user", (req, res) => {
+app.get("/users/:user/notes", (req, res) => {
     let user = req.params.user;
 
     let html = `<h3>${user} notes</h3><ol>`;
@@ -41,11 +42,12 @@ app.get("/users/:user", (req, res) => {
     userNotes.forEach(note => html = html + `<li>${note.title}</li>`);
     html += "<ol/>";
 
-    res.send(html)
+    res.send(html);
+
 });
 
 //добавить новую заметку
-app.post("/users/:user", (req, res) => {
+app.post("/users/:user/notes", (req, res) => {
     let user = String(req.params.user);
 
     let userNotes = notes[user];
@@ -68,7 +70,6 @@ app.get("/users/:user/notes/:id", (req, res) => {
                 <h3>${currentNote.title}</h3>
                 <p>${currentNote.body}</p>`;
 
-
     res.send(html);
 });
 
@@ -79,11 +80,10 @@ app.put("/users/:user/notes/:id", (req, res) => {
     let currentNote = userNotes[Number(req.params.id)];
 
     currentNote.title = req.body.title;
-    currentNote.body = req.body.body
+    currentNote.body = req.body.body;
 
     res.send(currentNote);
 });
-
 
 app.listen(3001, () => {
     console.log("Server is up and running on port 3001 ");
