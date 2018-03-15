@@ -57,18 +57,6 @@ app.post("/users/:user", (req, res) => {
     res.send(userNotes);
 });
 
-//удалить все заметки,пока не доделал
-app.delete("/users/:user", (req, res) => {
-    // let user = String(req.params.user);
-    // let currNotes = notes[user];
-    //
-    // currNotes.filter((_, i) => i != 1);
-    //
-    // res.sendStatus(200);
-    // console.log(currNotes.filter((_, i) => i != 1))
-
-});
-
 //текущая/выбранная заметка
 app.get("/users/:user/notes/:id", (req, res) => {
     let user = String(req.params.user);
