@@ -41,7 +41,6 @@ app.post("/users", (req, res) => {
     });
 
     if(!req.body.username ){//не уверен насчёт этого условия
-        res.json(users);
         res.send("not found username")
     } else{
         res.json(users);
