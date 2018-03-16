@@ -1,15 +1,15 @@
 {
   "users":
     [
-      {"username": "First user", "id": "0"},
-      {"username": "Second user","id": "1"},
-      {"username": "Third user", "id": "2"}
+      {"username": "First user", "id": "1"},
+      {"username": "Second user","id": "2"},
+      {"username": "Third user", "id": "3"}
     ],
   "notes":
     [
-      {"title": "First Post", "userId": "0"},
-      {"title": "third Post", "userId": "1"},
-      {"title": "second Post", "userId": "2"},
-      {"title": "new post", "userId": "0"}
+      {"title": "First Post", "userId": "1"},
+      {"title": "third Post", "userId": "2"},
+      {"title": "second Post", "userId": "3"},
+      {"title": "new post", "userId": "1"}
     ]
 }

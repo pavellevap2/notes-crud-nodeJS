@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 
+const R = require("ramda");
 const app = express();
 
 let users = require("./db/db").users;
@@ -18,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 //список всех юзеров
-app.get("/users", (req, res) => {
+app.get("/api/users", (req, res) => {
     let html = "<h3>Users</h3><ol>";
 
     users.forEach(user => html = html + `<li>${user.username}</li>` );
@@ -34,26 +35,28 @@ app.get("/users", (req, res) => {
 });
 
 //добавить юзера
-app.post("/users", (req, res) => {
-    users.push({
-        id : users.length + 1,
-        username: req.body.username
-    });
+app.post("/api/users", (req, res) => {
 
-    if(!req.body.username ){//не уверен насчёт этого условия
-        res.send("not found username")
-    } else{
-        res.json(users);
+    if(req.body.username){
+        res.status(400);
+        res.send("invalid data")
+    } else {
+        users.push({
+            id : users.length + 1,
+            username: req.body.username
+        });
     }
+    res.status(200);
+    res.json(users);
 
 });
 
 //обновить юзера
-app.put("/users/:id", (req, res) => {
-   let user = users.find((user) => user.id == Number(req.params.id - 1));
+app.put("/api/users/:id", (req, res) => {
+   let user = users.find((user) => user.id == Number(req.params.id ));
    user.username = req.body.username;
 
-   if( !req.body.username){
+   if( req.body.username){
        res.sendStatus(200);
    } else {
        res.sendStatus(404);
@@ -62,8 +65,8 @@ app.put("/users/:id", (req, res) => {
 });
 
 //удалить юзера
-app.delete("/users/:id", (req, res) => {
-    users = users.filter(user =>  user.id != Number(req.params.id -1 ) );
+app.delete("/api/users/:id", (req, res) => {
+    users = users.filter(user =>  user.id != Number(req.params.id  ) );
 
     if(!users){
         res.sendStatus(404);
@@ -74,12 +77,12 @@ app.delete("/users/:id", (req, res) => {
 
 
 //все заметки
-app.get("/notes", (req, res) => {
+app.get("/api/notes", (req, res) => {
     let html = `<h3>Notes of users</h3><ol>`;
 
     notes.forEach(note => html = html +
             `<li>
-                <h4>${users[note.userId].username}</h4>
+                <h4>${users[note.userId - 1].username}</h4>
                 <p>${note.title}</p>
              </li>`
     );
@@ -95,21 +98,25 @@ app.get("/notes", (req, res) => {
 });
 
 //добавить новую заметку
-app.post("/notes", (req, res) => {
-    notes.push({
-        userId: req.body.userId,
-        title: req.body.title
-    });
-    if(!req.body.title && !req.body.userId){
-        res.sendStatus(404)
+app.post("/api/notes", (req, res) => {
+
+
+    if(req.body.title && req.body.userId){
+        notes.push({
+            userId: req.body.userId,
+            title: req.body.title
+        });
     } else {
-        res.json(notes);
+        res.status(400);
+        res.send("invalid data")
     }
+    res.status(200);
+    res.json(notes);
 });
 
 //обновить заметку
-app.put("/notes/:id", (req, res) => {
-    let note = notes[req.params.id - 1];
+app.put("/api/notes/:id", (req, res) => {
+    let note = notes[req.params.id ];
     note.title = req.body.title;
 
     if(req.body.title){
@@ -120,8 +127,8 @@ app.put("/notes/:id", (req, res) => {
 });
 
 //удалить заметку
-app.delete("/notes/:id", (req, res) => {
-    notes = notes.filter(notes => notes.userId != Number(req.params.id - 1));
+app.delete("/api/notes/:id", (req, res) => {
+    notes = notes.filter(notes => notes.userId != Number(req.params.id ));
 
     if(!notes){
         res.sendStatus(404);
