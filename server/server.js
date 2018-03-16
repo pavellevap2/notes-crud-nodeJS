@@ -4,8 +4,8 @@ const path = require("path");
 
 const app = express();
 
-let users = require("./db/users");
-let notes = require("./db/notes");
+let users = require("./db/db").users;
+let notes = require("./db/db").notes;
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -17,72 +17,119 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../', 'index.html'));
 });
 
+//список всех юзеров
 app.get("/users", (req, res) => {
     let html = "<h3>Users</h3><ol>";
-    users.forEach(user => html = html + `<li>${user.name}</li>` );
+
+    users.forEach(user => html = html + `<li>${user.username}</li>` );
     html += "</ol>";
-    res.send(html);
+
+    if(!html) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not found');
+    } else {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(html)
+    }
 });
 
+//добавить юзера
 app.post("/users", (req, res) => {
     users.push({
         id : users.length + 1,
-        name : req.body.name
+        username: req.body.username
     });
-    res.send(users);
+
+    if(!req.body.username ){//не уверен насчёт этого условия
+        res.json(users);
+        res.send("not found username")
+    } else{
+        res.json(users);
+    }
+
+});
+
+//обновить юзера
+app.put("/users/:id", (req, res) => {
+   let user = users.find((user) => user.id == Number(req.params.id - 1));
+   user.username = req.body.username;
+
+   if( !req.body.username){
+       res.sendStatus(200);
+   } else {
+       res.sendStatus(404);
+   }
+
+});
+
+//удалить юзера
+app.delete("/users/:id", (req, res) => {
+    users = users.filter(user =>  user.id != Number(req.params.id -1 ) );
+
+    if(!users){
+        res.sendStatus(404);
+    } else {
+        res.sendStatus(200);
+    }
 });
 
 
-//страница всех заметок пользователя
-app.get("/users/:user/notes", (req, res) => {
-    let user = req.params.user;
+//все заметки
+app.get("/notes", (req, res) => {
+    let html = `<h3>Notes of users</h3><ol>`;
 
-    let html = `<h3>${user} notes</h3><ol>`;
-    let userNotes  = notes[user];
-    userNotes.forEach(note => html = html + `<li>${note.title}</li>`);
+    notes.forEach(note => html = html +
+            `<li>
+                <h4>${users[note.userId].username}</h4>
+                <p>${note.title}</p>
+             </li>`
+    );
     html += "<ol/>";
 
-    res.send(html);
-
+    if(!html) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not found');
+    } else {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.end(html)
+    }
 });
 
 //добавить новую заметку
-app.post("/users/:user/notes", (req, res) => {
-    let user = String(req.params.user);
-
-    let userNotes = notes[user];
-    userNotes.push({
-        title : req.body.title,
-        body : req.body.body
+app.post("/notes", (req, res) => {
+    notes.push({
+        userId: req.body.userId,
+        title: req.body.title
     });
-
-    res.send(userNotes);
+    if(!req.body.title && !req.body.userId){
+        res.sendStatus(404)
+    } else {
+        res.json(notes);
+    }
 });
 
-//текущая/выбранная заметка
-app.get("/users/:user/notes/:id", (req, res) => {
-    let user = String(req.params.user);
+//обновить заметку
+app.put("/notes/:id", (req, res) => {
+    let note = notes[req.params.id - 1];
+    note.title = req.body.title;
 
-    let userNotes = notes[user];
-    let currentNote = userNotes[Number(req.params.id)];
-
-    let html = `<h1>${user} note number ${Number(req.params.id)}</h1>
-                <h3>${currentNote.title}</h3>
-                <p>${currentNote.body}</p>`;
-
-    res.send(html);
+    if(req.body.title){
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(404);
+    }
 });
 
-//обновить текущую заметку
-app.put("/users/:user/notes/:id", (req, res) => {
-    let user = String(req.params.user);
-    let userNotes = notes[user];
-    let currentNote = userNotes[Number(req.params.id)];
+//удалить заметку
+app.delete("/notes/:id", (req, res) => {
+    notes = notes.filter(notes => notes.userId != Number(req.params.id - 1));
 
-    currentNote.title = req.body.title;
-    currentNote.body = req.body.body;
+    if(!notes){
+        res.sendStatus(404);
+    } else {
+        res.sendStatus(200);
+    }
 
-    res.send(currentNote);
 });
 
 app.listen(3001, () => {

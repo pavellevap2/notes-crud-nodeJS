@@ -1,0 +1,15 @@
+{
+  "users":
+    [
+      {"username": "First user", "id": "0"},
+      {"username": "Second user","id": "1"},
+      {"username": "Third user", "id": "2"}
+    ],
+  "notes":
+    [
+      {"title": "First Post", "userId": "0"},
+      {"title": "third Post", "userId": "1"},
+      {"title": "second Post", "userId": "2"},
+      {"title": "new post", "userId": "0"}
+    ]
+}
